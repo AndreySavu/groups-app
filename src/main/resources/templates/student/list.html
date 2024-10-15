@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Группа №<span th:text="${group.groupName}"></span></title>
+    <style type="text/css">
+        TABLE {
+            width: 450px;
+            border-collapse: collapse;
+        }
+        TD, TH {
+            padding: 3px;
+            border: 1px solid black;
+        }
+        TH {
+            background: #d1d1e0;
+        }
+        .delete-link {
+            color: blue; /* Цвет текста для ссылки */
+            cursor: pointer; /* Курсор при наведении */
+            text-decoration: underline; /* Подчёркивание для указания на ссылку */
+        }
+    </style>
+</head>
+<body>
+<h1>Группа №<span th:text="${group.groupName}"></span></h1>
+<table id="students-table">
+    <tr>
+        <th>Дата принятия</th>
+        <th>ФИО студента</th>
+        <th>Действия</th>
+    </tr>
+    <tr th:each="student : ${students}" id="student-row-[[${student.id}]]">
+        <td th:text="${student.admissionDate}"></td>
+        <td th:text="${student.fullName}"></td>
+        <td>
+            <a
+                    th:data-student-id="${student.id}"
+                    class="delete-link">
+                delete
+            </a>
+        </td>
+    </tr>
+</table>
+<br>
+<form id="add-student-form" th:action="@{/groups/{groupId}/students/add(groupId=${group.id})}" method="post">
+    <input type="text" name="fullName" placeholder="ФИО студента" required/>
+    <br>
+    <button type="submit">Добавить нового студента</button>
+</form>
+<br>
+<form action="#" th:action="@{/groups}">
+    <button type="submit">Вернуться к списку групп</button>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const groupId = [[${group.id}]];
+        const addForm = document.getElementById('add-student-form');
+        const deleteLinks = document.querySelectorAll('.delete-link');
+
+        addForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const fullName = addForm.querySelector('input[name="fullName"]').value;
+
+            fetch(`/groups/${groupId}/students/add`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ fullName })
+            })
+            .then(response => response.ok ? response.text() : Promise.reject(response))
+            .then(data => {
+                console.log('Студент добавлен');
+            })
+            .catch(error => console.error('Ошибка:', error));
+        });
+
+        deleteLinks.forEach(link => {
+            link.addEventListener('click', function () {
+                const studentId = this.getAttribute('data-student-id');
+
+                fetch(`/groups/${groupId}/students/${studentId}/delete`, {
+                    method: 'POST',
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Ошибка сети');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    const row = document.getElementById(`student-row-${studentId}`);
+                    if (row) {
+                        row.remove();
+                    }
+                    console.log('Студент удален');
+                })
+                .catch(error => console.error('Ошибка:', error));
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

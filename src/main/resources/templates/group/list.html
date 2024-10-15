@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Группы университета ScaleApps</title>
+    <style type="text/css">
+        TABLE {
+         width: 450px; /* Ширина таблицы */
+         border-collapse: collapse; /* Убираем двойные линии между ячейками */
+        }
+        TD, TH {
+         padding: 3px; /* Поля вокруг содержимого таблицы */
+         border: 1px solid black; /* Параметры рамки */
+        }
+        TH {
+         background: #d1d1e0; /* Цвет фона */
+        }
+    </style>
+</head>
+<body>
+<h1>Группы университета ScaleApps</h1>
+<table>
+    <tr>
+        <th>Номер группы</th>
+        <th>Количество студентов</th>
+        <th>Действия</th>
+    </tr>
+    <tr th:each="group : ${groups}">
+        <td th:text="${group.groupName}"></td>
+        <td th:text="${group.studentCount}"></td>
+        <td><a th:href="@{/groups/{id}/students(id=${group.id})}">edit</a></td>
+    </tr>
+</table>
+<br>
+<form id="add-group-form" th:action="@{/groups/add}" method="post">
+    <input type="text" name="groupName" placeholder="Номер группы" required/>
+    <br>
+    <button type="submit">Добавить новую группу</button>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addForm = document.getElementById('add-group-form');
+
+        addForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const groupName = addForm.querySelector('input[name="groupName"]').value;
+
+            fetch(addForm.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ groupName })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка при добавлении группы');
+                }
+                return response.json();
+            })
+            .then(groupId => {
+                window.location.href = `/groups/${groupId}/students`;
+            })
+            .catch(error => console.error('Ошибка:', error));
+        });
+    });
+</script>
+
+</body>
+</html>
