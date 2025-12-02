@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  groups-app-db:
+    image: mysql:8.0
+    container_name: groups-app-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}:root"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}:university"
+      MYSQL_USER: "${MYSQL_USER}:user"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}:qwerty"
+    ports:
+      - "${DB_OUTER_PORT}:3306"
+    volumes:
+      - groups-app-volume:/var/lib/mysql
+    networks:
+      groups-app:
+
+volumes:
+  groups-app-volume:
+
+networks:
+  groups-app:

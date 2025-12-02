@@ -28,7 +28,7 @@ public class StudentController {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new IllegalArgumentException("Неверный group id:" + groupId));
 
-        List<Student> students = studentRepository.findByUniversityGroupIdOrderByFullNameAsc(groupId);
+        List<Student> students = studentRepository.findByGroupIdOrderByFullNameAsc(groupId);
         model.addAttribute("students", students);
         model.addAttribute("group", group);
         return "student/list";
