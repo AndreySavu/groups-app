@@ -14,8 +14,8 @@
    ```
 4. Запустите приложение с помощью Maven:
    ```bash
-      mvn clean install
-      mvn spring-boot:run
+   mvn clean install
+   mvn spring-boot:run
    ```
 ## Документация
 
